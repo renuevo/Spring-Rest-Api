@@ -4,6 +4,13 @@ import com.github.renuevo.restapi.dto.PersonDto;
 import lombok.Getter;
 import org.springframework.hateoas.ResourceSupport;
 
+/**
+ * <pre>
+ * @className : PersonDtoResponse
+ * @author : Deokhwa.Kim
+ * @since : 2019-11-14
+ * </pre>
+ */
 public class PersonDtoResponse extends ResourceSupport {
 
     @Getter

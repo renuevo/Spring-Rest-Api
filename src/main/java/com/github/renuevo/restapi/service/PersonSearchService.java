@@ -24,8 +24,14 @@ public class PersonSearchService {
     public PersonDtoListResponse personSearchList(PersonDto personDto) {
 
         List<PersonDtoResponse> personDtoResponseList = Lists.newArrayList();
-        PersonDtoListResponse personDtoListResponse = new PersonDtoListResponse(personDtoResponseList);
 
+        PersonDtoListResponse personDtoListResponse = new PersonDtoListResponse(personDtoResponseList); //return type
+
+        /*
+        personDtoListResponse.add( ControllerLinkBuilder
+                .linkTo(ControllerLinkBuilder.methodOn(Controller.class).searchDoc(personDto))
+                .withRel("view"));
+*/
         return personDtoListResponse;
     }
 }

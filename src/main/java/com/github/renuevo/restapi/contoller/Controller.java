@@ -3,6 +3,7 @@ package com.github.renuevo.restapi.contoller;
 
 import com.github.renuevo.restapi.dto.PersonDto;
 import com.github.renuevo.restapi.response.PersonDtoListResponse;
+import com.github.renuevo.restapi.response.PersonDtoResponse;
 import com.github.renuevo.restapi.service.PersonSearchService;
 import com.github.renuevo.restapi.validator.PersonDtoValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.net.URI;
 
 @Slf4j
@@ -29,14 +32,32 @@ public class Controller {
         this.personSearchService = personSearchService;
     }
 
-    @PostMapping(value = "/doc/", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-    public ResponseEntity createDoc(@RequestBody PersonDto personDto) {
+    /**
+     * <pre>
+     *  @methodName : createDoc
+     *  @author : Deokhwa.Kim
+     *  @since : 2019-11-14 오후 6:33
+     *  @summary :
+     *  @param : [personDto, id]
+     *  @return : org.springframework.http.ResponseEntity
+     * </pre>
+     */
+    @PostMapping(value = "/doc/{id}", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+    public ResponseEntity createDoc(@RequestBody PersonDto personDto, @PathVariable String id) {
+        //create URI info
         URI create = ControllerLinkBuilder
-                .linkTo(ControllerLinkBuilder.methodOn(Controller.class).createDoc(personDto))
+                .linkTo(ControllerLinkBuilder.methodOn(Controller.class).createDoc(personDto, id))
                 .slash("{id}")
                 .toUri();
-        personDto.setId("10");
-        return ResponseEntity.created(create).body(personDto);
+
+        PersonDtoResponse personDtoResponse = new PersonDtoResponse(personDto);
+
+        //Self Link
+        personDtoResponse.add(ControllerLinkBuilder
+                .linkTo(ControllerLinkBuilder.methodOn(Controller.class).createDoc(personDto, id))
+                .withSelfRel());
+
+        return ResponseEntity.created(create).body(personDtoResponse);
     }
 
     /**
@@ -49,7 +70,7 @@ public class Controller {
      *  @return : org.springframework.http.ResponseEntity
      * </pre>
      */
-    @GetMapping(value = "search")
+    @GetMapping(value = "/search")
     public ResponseEntity searchDoc(@ModelAttribute @Valid PersonDto personDto, Errors errors) {
         PersonDtoListResponse personDtoListResponse;
         try {
@@ -77,4 +98,21 @@ public class Controller {
 
         return ResponseEntity.ok(personDtoListResponse);
     }
+
+
+    @GetMapping(value = "/view/{id}")
+    public ResponseEntity personView( @PathVariable @Valid @Min(3) Integer id) {
+        PersonDtoResponse personDtoResponse = new PersonDtoResponse(new PersonDto());
+        try {
+
+        } catch (Exception e) {
+            log.error("Api View Error {}", e.getMessage(), e);
+            log.error("Error Id {}", id);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(personDtoResponse);
+    }
+
+
 }

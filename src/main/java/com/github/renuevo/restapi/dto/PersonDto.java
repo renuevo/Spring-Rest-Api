@@ -1,5 +1,6 @@
 package com.github.renuevo.restapi.dto;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,13 @@ public class PersonDto {
     public boolean getEmptyCheck() throws IllegalAccessException {
         for (Field f : getClass().getDeclaredFields()) {
             if (!defaultParamSet.contains(f.getName()))
-                if (f.get(this) != null)
+                if(f.get(this) instanceof String){
+                    f.set(this, ((String) f.get(this)).replaceAll("[*'!\"‘“#@:;.\\^\\\\&%~/]", "")); //특수문자 관련 제거
+                    if (!Strings.isNullOrEmpty((String) f.get(this)))
+                        return false;
+                }else if(f.get(this) != null){
                     return false;
+                }
         }
         return true;
     }
